@@ -1,0 +1,576 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"/><title>장표 및 소개</title><style>
+/* webkit printing magic: print all background colors */
+html {
+	-webkit-print-color-adjust: exact;
+}
+* {
+	box-sizing: border-box;
+	-webkit-print-color-adjust: exact;
+}
+
+html,
+body {
+	margin: 0;
+	padding: 0;
+}
+@media only screen {
+	body {
+		margin: 2em auto;
+		max-width: 900px;
+		color: rgb(55, 53, 47);
+	}
+}
+
+body {
+	line-height: 1.5;
+	white-space: pre-wrap;
+}
+
+a,
+a.visited {
+	color: inherit;
+	text-decoration: underline;
+}
+
+.pdf-relative-link-path {
+	font-size: 80%;
+	color: #444;
+}
+
+h1,
+h2,
+h3 {
+	letter-spacing: -0.01em;
+	line-height: 1.2;
+	font-weight: 600;
+	margin-bottom: 0;
+}
+
+.page-title {
+	font-size: 2.5rem;
+	font-weight: 700;
+	margin-top: 0;
+	margin-bottom: 0.75em;
+}
+
+h1 {
+	font-size: 1.875rem;
+	margin-top: 1.875rem;
+}
+
+h2 {
+	font-size: 1.5rem;
+	margin-top: 1.5rem;
+}
+
+h3 {
+	font-size: 1.25rem;
+	margin-top: 1.25rem;
+}
+
+.source {
+	border: 1px solid #ddd;
+	border-radius: 3px;
+	padding: 1.5em;
+	word-break: break-all;
+}
+
+.callout {
+	border-radius: 3px;
+	padding: 1rem;
+}
+
+figure {
+	margin: 1.25em 0;
+	page-break-inside: avoid;
+}
+
+figcaption {
+	opacity: 0.5;
+	font-size: 85%;
+	margin-top: 0.5em;
+}
+
+mark {
+	background-color: transparent;
+}
+
+.indented {
+	padding-left: 1.5em;
+}
+
+hr {
+	background: transparent;
+	display: block;
+	width: 100%;
+	height: 1px;
+	visibility: visible;
+	border: none;
+	border-bottom: 1px solid rgba(55, 53, 47, 0.09);
+}
+
+img {
+	max-width: 100%;
+}
+
+@media only print {
+	img {
+		max-height: 100vh;
+		object-fit: contain;
+	}
+}
+
+@page {
+	margin: 1in;
+}
+
+.collection-content {
+	font-size: 0.875rem;
+}
+
+.column-list {
+	display: flex;
+	justify-content: space-between;
+}
+
+.column {
+	padding: 0 1em;
+}
+
+.column:first-child {
+	padding-left: 0;
+}
+
+.column:last-child {
+	padding-right: 0;
+}
+
+.table_of_contents-item {
+	display: block;
+	font-size: 0.875rem;
+	line-height: 1.3;
+	padding: 0.125rem;
+}
+
+.table_of_contents-indent-1 {
+	margin-left: 1.5rem;
+}
+
+.table_of_contents-indent-2 {
+	margin-left: 3rem;
+}
+
+.table_of_contents-indent-3 {
+	margin-left: 4.5rem;
+}
+
+.table_of_contents-link {
+	text-decoration: none;
+	opacity: 0.7;
+	border-bottom: 1px solid rgba(55, 53, 47, 0.18);
+}
+
+table,
+th,
+td {
+	border: 1px solid rgba(55, 53, 47, 0.09);
+	border-collapse: collapse;
+}
+
+table {
+	border-left: none;
+	border-right: none;
+}
+
+th,
+td {
+	font-weight: normal;
+	padding: 0.25em 0.5em;
+	line-height: 1.5;
+	min-height: 1.5em;
+	text-align: left;
+}
+
+th {
+	color: rgba(55, 53, 47, 0.6);
+}
+
+ol,
+ul {
+	margin: 0;
+	margin-block-start: 0.6em;
+	margin-block-end: 0.6em;
+}
+
+li > ol:first-child,
+li > ul:first-child {
+	margin-block-start: 0.6em;
+}
+
+ul > li {
+	list-style: disc;
+}
+
+ul.to-do-list {
+	text-indent: -1.7em;
+}
+
+ul.to-do-list > li {
+	list-style: none;
+}
+
+.to-do-children-checked {
+	text-decoration: line-through;
+	opacity: 0.375;
+}
+
+ul.toggle > li {
+	list-style: none;
+}
+
+ul {
+	padding-inline-start: 1.7em;
+}
+
+ul > li {
+	padding-left: 0.1em;
+}
+
+ol {
+	padding-inline-start: 1.6em;
+}
+
+ol > li {
+	padding-left: 0.2em;
+}
+
+.mono ol {
+	padding-inline-start: 2em;
+}
+
+.mono ol > li {
+	text-indent: -0.4em;
+}
+
+.toggle {
+	padding-inline-start: 0em;
+	list-style-type: none;
+}
+
+/* Indent toggle children */
+.toggle > li > details {
+	padding-left: 1.7em;
+}
+
+.toggle > li > details > summary {
+	margin-left: -1.1em;
+}
+
+.selected-value {
+	display: inline-block;
+	padding: 0 0.5em;
+	background: rgba(206, 205, 202, 0.5);
+	border-radius: 3px;
+	margin-right: 0.5em;
+	margin-top: 0.3em;
+	margin-bottom: 0.3em;
+	white-space: nowrap;
+}
+
+.collection-title {
+	display: inline-block;
+	margin-right: 1em;
+}
+
+time {
+	opacity: 0.5;
+}
+
+.icon {
+	display: inline-block;
+	max-width: 1.2em;
+	max-height: 1.2em;
+	text-decoration: none;
+	vertical-align: text-bottom;
+	margin-right: 0.5em;
+}
+
+img.icon {
+	border-radius: 3px;
+}
+
+.user-icon {
+	width: 1.5em;
+	height: 1.5em;
+	border-radius: 100%;
+	margin-right: 0.5rem;
+}
+
+.user-icon-inner {
+	font-size: 0.8em;
+}
+
+.text-icon {
+	border: 1px solid #000;
+	text-align: center;
+}
+
+.page-cover-image {
+	display: block;
+	object-fit: cover;
+	width: 100%;
+	height: 30vh;
+}
+
+.page-header-icon {
+	font-size: 3rem;
+	margin-bottom: 1rem;
+}
+
+.page-header-icon-with-cover {
+	margin-top: -0.72em;
+	margin-left: 0.07em;
+}
+
+.page-header-icon img {
+	border-radius: 3px;
+}
+
+.link-to-page {
+	margin: 1em 0;
+	padding: 0;
+	border: none;
+	font-weight: 500;
+}
+
+p > .user {
+	opacity: 0.5;
+}
+
+td > .user,
+td > time {
+	white-space: nowrap;
+}
+
+input[type="checkbox"] {
+	transform: scale(1.5);
+	margin-right: 0.6em;
+	vertical-align: middle;
+}
+
+p {
+	margin-top: 0.5em;
+	margin-bottom: 0.5em;
+}
+
+.image {
+	border: none;
+	margin: 1.5em 0;
+	padding: 0;
+	border-radius: 0;
+	text-align: center;
+}
+
+.code,
+code {
+	background: rgba(135, 131, 120, 0.15);
+	border-radius: 3px;
+	padding: 0.2em 0.4em;
+	border-radius: 3px;
+	font-size: 85%;
+	tab-size: 2;
+}
+
+code {
+	color: #eb5757;
+}
+
+.code {
+	padding: 1.5em 1em;
+}
+
+.code > code {
+	background: none;
+	padding: 0;
+	font-size: 100%;
+	color: inherit;
+}
+
+blockquote {
+	font-size: 1.25em;
+	margin: 1em 0;
+	padding-left: 1em;
+	border-left: 3px solid rgb(55, 53, 47);
+}
+
+.bookmark-href {
+	font-size: 0.75em;
+	opacity: 0.5;
+}
+
+.sans { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol"; }
+.code { font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, Courier, monospace; }
+.serif { font-family: Lyon-Text, Georgia, KaiTi, STKaiTi, '华文楷体', KaiTi_GB2312, '楷体_GB2312', serif; }
+.mono { font-family: Nitti, 'Microsoft YaHei', '微软雅黑', monospace; }
+.pdf .sans { font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK SC', 'Noto Sans CJK KR'; }
+
+.pdf .code { font-family: Source Code Pro, 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK SC', 'Noto Sans Mono CJK KR'; }
+
+.pdf .serif { font-family: PT Serif, Lyon-Text, Georgia, KaiTi, STKaiTi, '华文楷体', KaiTi_GB2312, '楷体_GB2312', serif, 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK SC', 'Noto Sans CJK KR'; }
+
+.pdf .mono { font-family: PT Mono, Nitti, 'Microsoft YaHei', '微软雅黑', monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK SC', 'Noto Sans Mono CJK KR'; }
+
+.highlight-default {
+}
+.highlight-gray {
+	color: rgb(155,154,151);
+}
+.highlight-brown {
+	color: rgb(100,71,58);
+}
+.highlight-orange {
+	color: rgb(217,115,13);
+}
+.highlight-yellow {
+	color: rgb(223,171,1);
+}
+.highlight-teal {
+	color: rgb(15,123,108);
+}
+.highlight-blue {
+	color: rgb(11,110,153);
+}
+.highlight-purple {
+	color: rgb(105,64,165);
+}
+.highlight-pink {
+	color: rgb(173,26,114);
+}
+.highlight-red {
+	color: rgb(224,62,62);
+}
+.highlight-gray_background {
+	background: rgb(235,236,237);
+}
+.highlight-brown_background {
+	background: rgb(233,229,227);
+}
+.highlight-orange_background {
+	background: rgb(250,235,221);
+}
+.highlight-yellow_background {
+	background: rgb(251,243,219);
+}
+.highlight-teal_background {
+	background: rgb(221,237,234);
+}
+.highlight-blue_background {
+	background: rgb(221,235,241);
+}
+.highlight-purple_background {
+	background: rgb(234,228,242);
+}
+.highlight-pink_background {
+	background: rgb(244,223,235);
+}
+.highlight-red_background {
+	background: rgb(251,228,228);
+}
+.block-color-default {
+	color: inherit;
+	fill: inherit;
+}
+.block-color-gray {
+	color: rgba(55, 53, 47, 0.6);
+	fill: rgba(55, 53, 47, 0.6);
+}
+.block-color-brown {
+	color: rgb(100,71,58);
+	fill: rgb(100,71,58);
+}
+.block-color-orange {
+	color: rgb(217,115,13);
+	fill: rgb(217,115,13);
+}
+.block-color-yellow {
+	color: rgb(223,171,1);
+	fill: rgb(223,171,1);
+}
+.block-color-teal {
+	color: rgb(15,123,108);
+	fill: rgb(15,123,108);
+}
+.block-color-blue {
+	color: rgb(11,110,153);
+	fill: rgb(11,110,153);
+}
+.block-color-purple {
+	color: rgb(105,64,165);
+	fill: rgb(105,64,165);
+}
+.block-color-pink {
+	color: rgb(173,26,114);
+	fill: rgb(173,26,114);
+}
+.block-color-red {
+	color: rgb(224,62,62);
+	fill: rgb(224,62,62);
+}
+.block-color-gray_background {
+	background: rgb(235,236,237);
+}
+.block-color-brown_background {
+	background: rgb(233,229,227);
+}
+.block-color-orange_background {
+	background: rgb(250,235,221);
+}
+.block-color-yellow_background {
+	background: rgb(251,243,219);
+}
+.block-color-teal_background {
+	background: rgb(221,237,234);
+}
+.block-color-blue_background {
+	background: rgb(221,235,241);
+}
+.block-color-purple_background {
+	background: rgb(234,228,242);
+}
+.block-color-pink_background {
+	background: rgb(244,223,235);
+}
+.block-color-red_background {
+	background: rgb(251,228,228);
+}
+
+.checkbox {
+	display: inline-flex;
+	vertical-align: text-bottom;
+	width: 16;
+	height: 16;
+	background-size: 16px;
+	margin-left: 2px;
+	margin-right: 5px;
+}
+
+.checkbox-on {
+	background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Crect%20width%3D%2216%22%20height%3D%2216%22%20fill%3D%22%2358A9D7%22%2F%3E%0A%3Cpath%20d%3D%22M6.71429%2012.2852L14%204.9995L12.7143%203.71436L6.71429%209.71378L3.28571%206.2831L2%207.57092L6.71429%2012.2852Z%22%20fill%3D%22white%22%2F%3E%0A%3C%2Fsvg%3E");
+}
+
+.checkbox-off {
+	background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Crect%20x%3D%220.75%22%20y%3D%220.75%22%20width%3D%2214.5%22%20height%3D%2214.5%22%20fill%3D%22white%22%20stroke%3D%22%2336352F%22%20stroke-width%3D%221.5%22%2F%3E%0A%3C%2Fsvg%3E");
+}
+	
+</style></head><body><article id="7c0c1347-2b8d-47e1-845a-387d7ffc0e3b" class="page sans"><header><h1 class="page-title">장표 및 소개</h1><table class="properties"><tbody><tr class="property-row property-row-created_time"><th>Created</th><td><time>@Dec 13, 2019 5:16 PM</time></td></tr><tr class="property-row property-row-text"><th>Page</th><td>~ 14</td></tr></tbody></table></header><div class="page-body"><p id="c68b5ea8-2c40-4334-9739-fb64e70d7a7f" class="">RADOS 는 Ceph 의 지원 구성 요소이며, Ceph 의 현재 3 가지 핵심 응용 프로그램 구성 요소 인 RBD, RGW 및 CephFS (각각 블록, 오브젝트 및 파일시스템 인터페이스 제공) 외에도 RADOS 및 파생 된 Librados 표준 라이브러리를 기반으로 합니다. 다른 유형의 다른 응용 프로그램 구성 요소를 개발할 수도 있습니다. 이 책은 RADOS와 RBD, RGW 및 CephFS의 세 가지 핵심 응용 프로그램 구성 요소에 중점을두고 있습니다. 자세한 장과 소개는 다음과 같습니다.</p><p id="18865442-6c18-459d-932b-fc677518c702" class="">
+</p><h3 id="2471f686-3247-4870-b780-8d14df27d6b2" class="">1장 왕으로 계산(?) - CRUSH</h3><p id="659cccd0-19a8-42bf-96dc-b3c341789465" class="">CRUSH는 Ceph의 두 가지 핵심 디자인 중 하나입니다. CRUSH 의 우수한 설계 개념은 컴퓨팅 어드레싱, 높은 동시성 및 동적 데이터 밸런싱과 같은 기본 기능과 분산화와 같은 구현이 매우 편리하고 물리적 구조 변경을 효과적으로 방지하며 성능이 클러스터 크기에 따라 달라지는 맞춤형 복제 전략을 갖도록합니다.과</p><p id="51bb6113-1887-4f41-a528-cb67efd72b0d" class=""> 선형 확장 및 높은 신뢰성과 같은 고급 기능을 갖추고 있으므로 확장성, 성능 및 안정성에 대한 엄격한 요구 사항이 있는 Ceph 과 같은 대규모 분산 스토리지 시스템에 매우 적합합니다.</p><p id="c5c8d516-1cb2-4453-8aba-75c4044a6e89" class="">
+</p><h3 id="60d53c1b-1fe8-4321-beba-f3355c7cd5ea" class="">2장 최고의 성능</h3><p id="bfaba9be-9cae-4508-834a-93bdba7ceba8" class="">Jewel 릴리즈 이후, 커뮤니티는 10년 이상 서비스를 제공한 Filestore 를 대체하기 위해 새로운 유형의 고성능 오브젝트 스토리지 엔진인 BlueStore 를 도입했습니다. BlueStore 의 도입은 의심할 여지 없이 지난 2년 동안 Ceph 의 가장 매력적인 기능 중 하나입니다.</p><p id="681b91c9-51f5-4141-9dac-f8e214ff2fbc" class="">
+</p><h3 id="39595159-e460-4865-8619-78a983597acc" class="">3장 시공간 게임(?) - Erasure Code</h3><p id="968b5a9d-325a-4186-ad9a-397911effc5e" class="">eph 의 기존 3 카피 데이터 백업 방법은 높은 신뢰성을 달성한다는 전제에서 프론트엔드 요청의 응답 지연을 최소화 할 수 있으므로 안정성과 성능에 대한 요구사항이 있는 응용 프로그램에 적합합니다. 가장 널리 사용되는 3 카피 방법의 단점은 추가 스토리지 공간을 많이 차지하여 클러스터의 실제 공간 활용도가 낮아진다는 점입니다. </p><p id="5ed1d618-7b8c-4bbd-8cc0-f54ac2bc67d1" class="">반대로, Erasure Code 는 Strip 을 단위로 사용하며, 수학적 연산을 통해 k + m 백업 전략을 사용합니다. 지연 시간이 길기 때문에 지연에 민감하지 않는 &quot;콜드 데이터&quot; (예: 백업 데이터) 응용 프로그램에 적합합니다. Kraken 버전에서 커뮤니티는 처음으로 Erasure Coding 에서 가장 복잡한 덮어쓰기 문제를 해결하여 프로덕션 환경 시대의 시작을 보였습니다.</p><p id="1478a7de-4161-4dc5-868f-33a0e2eaa3b4" class="">
+</p><h3 id="e5fe0e82-e19d-4d76-ad6f-714c9861562d" class="">4장 이주의 아름다움(?) - PG</h3><p id="68dcf714-b3a7-40b7-84b9-3e242c5744d1" class="">PG 는 Ceph 의 가장 핵심적이고 복잡한 개념 중 하나이며, Ceph 의 가장 어려운 과제 중 하나입니다. PG 의 뛰어난 기능 중 가장 중요하고 눈에 띄는 것은, CRUSH 의 실시간 계산 결과를 기반으로 OSD 간에 자유룝게 마이그레이션 할 수 있다는 것입니다. 이는 Ceph 자동 데이터 복구 및 균형 유지를 할 수 있게 합니다.</p><p id="f29a298d-b7c5-482a-a97f-70eee7d48e23" class="">
+</p><h3 id="77baef46-ca42-454a-9d79-079bed377835" class="">5장 선행 제어(?) - QoS</h3><p id="78866e6f-76d7-4996-8528-38dfe45bd3c1" class="">가상화 기술이 인기를 얻고 있으며 제한된 리소스를 중앙에서 관리하고 필요할 때 할당하여 효율을 극대화하는 방법은 항상 주요 주제 중 하나였습니다. QoS 기능을 적극적으로 도입함으로서 Ceph 은 IOPS 및 클러스터 대역폭과 같은 I/O 리소스를 합리적으로 조정함으로서 외부에 보다 세련된 스토리지를 제공합니다.</p><p id="420e899b-8c92-44f8-b0de-fb31d80eaca2" class="">
+</p><h3 id="9a3a55e1-7ca6-4575-8637-1dbd8e7e847d" class="">6장 실수로(?)</h3><p id="37413ce0-9f39-4311-90b6-3fc828708ac6" class="">Sage A. Weil 이 2007년 공식적으로 Ceph 을 출시한 이후 Ceph 은 10년 이상 개발되었습니다. 설계 초기에 Ceph 은 순수 분산 파일 시스템 (Cephfs) 로 자리 잡았지만, 가상화가 점차 정보화 시대의 주제가 되었고, Openstack 이 대표하는 클라우드 컴퓨팅 기술의 등장으로 커뮤니티는 초점을 단호히 결정하고 개발에 집중하기 시작했습니다. </p><p id="ef135c33-5a36-4364-a755-e353dbdf0888" class="">새로운 유형의 분산 블록 스토리지 서비스 구성요소인 RBD 는 점차 가상머신, 미러링, 클라우드 디스크 및 Openstack 과 같은 IaaS 클라우드 컴퓨팅 환경의 기타 서비스에 없어서는 안될 기본 블록 디바이스 스토리지 백엔드가 되었습니다. Ceph 은 많은 유사한 소프트웨어의 경쟁에서 두드러질 수 있었으며, Openstack 의 성장 덕분에 점차 가장 인기있는 분산 통합 스토리지 시스템으로 성장할 수 있었습니다. </p><p id="4f966b25-74cc-4210-a107-0eb104fdb994" class="">
+</p><h3 id="ab53b026-7d7a-4fa8-a997-07b9ad953bd5" class="">7장 클라우드</h3><p id="e9b8a131-a4a8-4678-b994-41be41561ae4" class="">Wu Jun 박사는 &quot;Top of the Tide&quot; 저서의 서문에서 다음과 같이 말했습니다. &quot;100년이 넘는 기간동안 일부 회사는 기술 혁신의 끝에 서서 다행스럽게도 의식적/무의식적으로 일해 왔습니다. 10년 동안, 그들은 다음 물결까지 기술의 물결을 대표합니다(?)&quot;</p><p id="8bfc93d4-de51-40d4-902a-b34d82e7faef" class="">현재 떠오르는 클라우드 컴퓨팅은 차세대 기술 개발의 도래를 나타내고 있으며, AWS 를 기반으로 퍼블릭 클라우드 서비스를 처음 시작하고 퍼블릭 클라우드의 사실상 표준이 된 Amazon 은 의심의 여지 없이 물결의 선두에 서있습니다. 실제로, 2006년 도입된 이래 AWS 에 저장된 객체의 현재 규모는 천억 수준에 이르렀으며, 아마존에 100억 달러 이상의 수익이 축적되어 클라우드 컴퓨팅에 포함된 엄청난 비지니스 기회를 보여줍니다. AWS 는 스토리지 시스템이 기존 블록 및 파일 스토리지 (오브젝트 스토리지 인터페이스) 와 다른 세 번째 유형의 인터페이스를 제공할 수 있어야 하며, 사용자 정의 S3 프로토콜을 사용하여 HTTP 를 통해 전송합니다. 이러한 맥락에서 클라우드 컴퓨팅으로 표현된 이 기술의 물결을 따라 잡기 위해 Ceph 은 클라우드에서 생성된 S3-RGW 로 표현된 Object Storage Protocol Cluster의 Object Storage Gateway와 호환됩니다.</p><p id="5857f2d7-bd06-4237-9d72-08aee580aa45" class="">
+</p><h3 id="897f5a5d-b4a1-43af-ad16-efd47d16b807" class="">8장 클래식 재현</h3><p id="65c567ee-8e2c-42a5-8da3-c5e2e5f8fbd7" class="">파일시스템은 운영체제와 함께 탄생했으며, 컴퓨터 공학에서 가장 기본적이고 고전적인 개념 중 하나입니다. Ceph 은 탄생 이래 분산 파일 시스템으로서 자리매김했습니다.</p><p id="0b503823-0dcc-4226-a7a6-9cbc04c92ce1" class=""> Ceph 의 세 가지 일반적인 어플리케이션 시나리오에서 RBD 와 RGW 는 클라우드 컴퓨팅을 주도적으로 발전시켰으며, 나중에는 점점 인기를 얻었지만, 가장 초기의 CephFS 는 속도를 늦추었습니다. 첫번째 이유는 파일 시스템이 트리 구조를 사용하여 데이터 (파일 및 디렉토리) 를 관리하고, 주소를 지정하는 플랫 방법을 사용하는 Ceph 의 설계 개념과 호환되지 않았기 때문입니다. 파일 시스템을 지원하려면 Ceph 이 중앙 집중식 메타데이터 관리 서버 (어드레싱을 위한 트리 구조의 통합된 엔트리포인트) 를 도입해야 하며, 이는 거의 무제한적인 수평 확장성을 추구하는 Ceph 의 분산 설계 철학과 충돌합니다.</p><p id="6097761f-d5a3-41fd-9a68-fce495c0a411" class=""> 부인할 수 없는 사실 중 하나는 RBD 및 RGW 의 급격한 발전으로 인해 클라우드 컴퓨팅 이외의 영역에서 Ceph 이 급속히 대중화되어 점차 널리 알려지게 되었다는 것입니다. 업계에서는 기존 블록 및 파일 스토리지 장비가 감소함에 따라 Ceph 은 진정한 통합 스토리지 시스템으로서 기존 스토리지를 흡수할 수 있을 것으로 기대합니다. 따라서 긴 파일 장애에도 불구하고 기존 파일 스토리지를 교체하는데 중요한 부분으로 CephFS 리서치를 다시 시작하고, 가능한 빨리 프로덕션 환경에 배치하고 있습니다.</p><p id="8bb97bdb-b026-4451-a757-63e6d474249a" class="">
+</p><h3 id="f75e33be-52a7-456d-9e02-7099dc20a1ea" class="">9장 사용의 마술</h3><p id="0a6ab37f-7337-4a68-b834-bb6799c8c20c" class="">한마음으로 사용하십시오. Ceph의 기본 원칙을 배우는 데 오랜 시간을 보낸 후, 나는 대부분의 독자가 실습을 통해 Ceph의 마법을 경험할 수 있으리라 믿습니다. 이 책의 끝에서, 우리는 프로덕션 환경에서 사용되는 다양한 Ceph 운영을 독자들을위해 신중하게 준비했습니다.</p><p id="60e8ad06-a023-409d-a223-fabe2fba8ac8" class="">
+</p><p id="ca1a6389-5e74-4f29-9865-14d539d32aa9" class="">
+</p></div></article></body></html>

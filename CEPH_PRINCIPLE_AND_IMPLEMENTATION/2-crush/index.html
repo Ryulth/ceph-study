@@ -1,0 +1,617 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"/><title>확장 가능한, 해시에 기반한 CRUSH</title><style>
+/* webkit printing magic: print all background colors */
+html {
+	-webkit-print-color-adjust: exact;
+}
+* {
+	box-sizing: border-box;
+	-webkit-print-color-adjust: exact;
+}
+
+html,
+body {
+	margin: 0;
+	padding: 0;
+}
+@media only screen {
+	body {
+		margin: 2em auto;
+		max-width: 900px;
+		color: rgb(55, 53, 47);
+	}
+}
+
+body {
+	line-height: 1.5;
+	white-space: pre-wrap;
+}
+
+a,
+a.visited {
+	color: inherit;
+	text-decoration: underline;
+}
+
+.pdf-relative-link-path {
+	font-size: 80%;
+	color: #444;
+}
+
+h1,
+h2,
+h3 {
+	letter-spacing: -0.01em;
+	line-height: 1.2;
+	font-weight: 600;
+	margin-bottom: 0;
+}
+
+.page-title {
+	font-size: 2.5rem;
+	font-weight: 700;
+	margin-top: 0;
+	margin-bottom: 0.75em;
+}
+
+h1 {
+	font-size: 1.875rem;
+	margin-top: 1.875rem;
+}
+
+h2 {
+	font-size: 1.5rem;
+	margin-top: 1.5rem;
+}
+
+h3 {
+	font-size: 1.25rem;
+	margin-top: 1.25rem;
+}
+
+.source {
+	border: 1px solid #ddd;
+	border-radius: 3px;
+	padding: 1.5em;
+	word-break: break-all;
+}
+
+.callout {
+	border-radius: 3px;
+	padding: 1rem;
+}
+
+figure {
+	margin: 1.25em 0;
+	page-break-inside: avoid;
+}
+
+figcaption {
+	opacity: 0.5;
+	font-size: 85%;
+	margin-top: 0.5em;
+}
+
+mark {
+	background-color: transparent;
+}
+
+.indented {
+	padding-left: 1.5em;
+}
+
+hr {
+	background: transparent;
+	display: block;
+	width: 100%;
+	height: 1px;
+	visibility: visible;
+	border: none;
+	border-bottom: 1px solid rgba(55, 53, 47, 0.09);
+}
+
+img {
+	max-width: 100%;
+}
+
+@media only print {
+	img {
+		max-height: 100vh;
+		object-fit: contain;
+	}
+}
+
+@page {
+	margin: 1in;
+}
+
+.collection-content {
+	font-size: 0.875rem;
+}
+
+.column-list {
+	display: flex;
+	justify-content: space-between;
+}
+
+.column {
+	padding: 0 1em;
+}
+
+.column:first-child {
+	padding-left: 0;
+}
+
+.column:last-child {
+	padding-right: 0;
+}
+
+.table_of_contents-item {
+	display: block;
+	font-size: 0.875rem;
+	line-height: 1.3;
+	padding: 0.125rem;
+}
+
+.table_of_contents-indent-1 {
+	margin-left: 1.5rem;
+}
+
+.table_of_contents-indent-2 {
+	margin-left: 3rem;
+}
+
+.table_of_contents-indent-3 {
+	margin-left: 4.5rem;
+}
+
+.table_of_contents-link {
+	text-decoration: none;
+	opacity: 0.7;
+	border-bottom: 1px solid rgba(55, 53, 47, 0.18);
+}
+
+table,
+th,
+td {
+	border: 1px solid rgba(55, 53, 47, 0.09);
+	border-collapse: collapse;
+}
+
+table {
+	border-left: none;
+	border-right: none;
+}
+
+th,
+td {
+	font-weight: normal;
+	padding: 0.25em 0.5em;
+	line-height: 1.5;
+	min-height: 1.5em;
+	text-align: left;
+}
+
+th {
+	color: rgba(55, 53, 47, 0.6);
+}
+
+ol,
+ul {
+	margin: 0;
+	margin-block-start: 0.6em;
+	margin-block-end: 0.6em;
+}
+
+li > ol:first-child,
+li > ul:first-child {
+	margin-block-start: 0.6em;
+}
+
+ul > li {
+	list-style: disc;
+}
+
+ul.to-do-list {
+	text-indent: -1.7em;
+}
+
+ul.to-do-list > li {
+	list-style: none;
+}
+
+.to-do-children-checked {
+	text-decoration: line-through;
+	opacity: 0.375;
+}
+
+ul.toggle > li {
+	list-style: none;
+}
+
+ul {
+	padding-inline-start: 1.7em;
+}
+
+ul > li {
+	padding-left: 0.1em;
+}
+
+ol {
+	padding-inline-start: 1.6em;
+}
+
+ol > li {
+	padding-left: 0.2em;
+}
+
+.mono ol {
+	padding-inline-start: 2em;
+}
+
+.mono ol > li {
+	text-indent: -0.4em;
+}
+
+.toggle {
+	padding-inline-start: 0em;
+	list-style-type: none;
+}
+
+/* Indent toggle children */
+.toggle > li > details {
+	padding-left: 1.7em;
+}
+
+.toggle > li > details > summary {
+	margin-left: -1.1em;
+}
+
+.selected-value {
+	display: inline-block;
+	padding: 0 0.5em;
+	background: rgba(206, 205, 202, 0.5);
+	border-radius: 3px;
+	margin-right: 0.5em;
+	margin-top: 0.3em;
+	margin-bottom: 0.3em;
+	white-space: nowrap;
+}
+
+.collection-title {
+	display: inline-block;
+	margin-right: 1em;
+}
+
+time {
+	opacity: 0.5;
+}
+
+.icon {
+	display: inline-block;
+	max-width: 1.2em;
+	max-height: 1.2em;
+	text-decoration: none;
+	vertical-align: text-bottom;
+	margin-right: 0.5em;
+}
+
+img.icon {
+	border-radius: 3px;
+}
+
+.user-icon {
+	width: 1.5em;
+	height: 1.5em;
+	border-radius: 100%;
+	margin-right: 0.5rem;
+}
+
+.user-icon-inner {
+	font-size: 0.8em;
+}
+
+.text-icon {
+	border: 1px solid #000;
+	text-align: center;
+}
+
+.page-cover-image {
+	display: block;
+	object-fit: cover;
+	width: 100%;
+	height: 30vh;
+}
+
+.page-header-icon {
+	font-size: 3rem;
+	margin-bottom: 1rem;
+}
+
+.page-header-icon-with-cover {
+	margin-top: -0.72em;
+	margin-left: 0.07em;
+}
+
+.page-header-icon img {
+	border-radius: 3px;
+}
+
+.link-to-page {
+	margin: 1em 0;
+	padding: 0;
+	border: none;
+	font-weight: 500;
+}
+
+p > .user {
+	opacity: 0.5;
+}
+
+td > .user,
+td > time {
+	white-space: nowrap;
+}
+
+input[type="checkbox"] {
+	transform: scale(1.5);
+	margin-right: 0.6em;
+	vertical-align: middle;
+}
+
+p {
+	margin-top: 0.5em;
+	margin-bottom: 0.5em;
+}
+
+.image {
+	border: none;
+	margin: 1.5em 0;
+	padding: 0;
+	border-radius: 0;
+	text-align: center;
+}
+
+.code,
+code {
+	background: rgba(135, 131, 120, 0.15);
+	border-radius: 3px;
+	padding: 0.2em 0.4em;
+	border-radius: 3px;
+	font-size: 85%;
+	tab-size: 2;
+}
+
+code {
+	color: #eb5757;
+}
+
+.code {
+	padding: 1.5em 1em;
+}
+
+.code > code {
+	background: none;
+	padding: 0;
+	font-size: 100%;
+	color: inherit;
+}
+
+blockquote {
+	font-size: 1.25em;
+	margin: 1em 0;
+	padding-left: 1em;
+	border-left: 3px solid rgb(55, 53, 47);
+}
+
+.bookmark-href {
+	font-size: 0.75em;
+	opacity: 0.5;
+}
+
+.sans { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol"; }
+.code { font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, Courier, monospace; }
+.serif { font-family: Lyon-Text, Georgia, KaiTi, STKaiTi, '华文楷体', KaiTi_GB2312, '楷体_GB2312', serif; }
+.mono { font-family: Nitti, 'Microsoft YaHei', '微软雅黑', monospace; }
+.pdf .sans { font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK SC', 'Noto Sans CJK KR'; }
+
+.pdf .code { font-family: Source Code Pro, 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK SC', 'Noto Sans Mono CJK KR'; }
+
+.pdf .serif { font-family: PT Serif, Lyon-Text, Georgia, KaiTi, STKaiTi, '华文楷体', KaiTi_GB2312, '楷体_GB2312', serif, 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK SC', 'Noto Sans CJK KR'; }
+
+.pdf .mono { font-family: PT Mono, Nitti, 'Microsoft YaHei', '微软雅黑', monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK SC', 'Noto Sans Mono CJK KR'; }
+
+.highlight-default {
+}
+.highlight-gray {
+	color: rgb(155,154,151);
+}
+.highlight-brown {
+	color: rgb(100,71,58);
+}
+.highlight-orange {
+	color: rgb(217,115,13);
+}
+.highlight-yellow {
+	color: rgb(223,171,1);
+}
+.highlight-teal {
+	color: rgb(15,123,108);
+}
+.highlight-blue {
+	color: rgb(11,110,153);
+}
+.highlight-purple {
+	color: rgb(105,64,165);
+}
+.highlight-pink {
+	color: rgb(173,26,114);
+}
+.highlight-red {
+	color: rgb(224,62,62);
+}
+.highlight-gray_background {
+	background: rgb(235,236,237);
+}
+.highlight-brown_background {
+	background: rgb(233,229,227);
+}
+.highlight-orange_background {
+	background: rgb(250,235,221);
+}
+.highlight-yellow_background {
+	background: rgb(251,243,219);
+}
+.highlight-teal_background {
+	background: rgb(221,237,234);
+}
+.highlight-blue_background {
+	background: rgb(221,235,241);
+}
+.highlight-purple_background {
+	background: rgb(234,228,242);
+}
+.highlight-pink_background {
+	background: rgb(244,223,235);
+}
+.highlight-red_background {
+	background: rgb(251,228,228);
+}
+.block-color-default {
+	color: inherit;
+	fill: inherit;
+}
+.block-color-gray {
+	color: rgba(55, 53, 47, 0.6);
+	fill: rgba(55, 53, 47, 0.6);
+}
+.block-color-brown {
+	color: rgb(100,71,58);
+	fill: rgb(100,71,58);
+}
+.block-color-orange {
+	color: rgb(217,115,13);
+	fill: rgb(217,115,13);
+}
+.block-color-yellow {
+	color: rgb(223,171,1);
+	fill: rgb(223,171,1);
+}
+.block-color-teal {
+	color: rgb(15,123,108);
+	fill: rgb(15,123,108);
+}
+.block-color-blue {
+	color: rgb(11,110,153);
+	fill: rgb(11,110,153);
+}
+.block-color-purple {
+	color: rgb(105,64,165);
+	fill: rgb(105,64,165);
+}
+.block-color-pink {
+	color: rgb(173,26,114);
+	fill: rgb(173,26,114);
+}
+.block-color-red {
+	color: rgb(224,62,62);
+	fill: rgb(224,62,62);
+}
+.block-color-gray_background {
+	background: rgb(235,236,237);
+}
+.block-color-brown_background {
+	background: rgb(233,229,227);
+}
+.block-color-orange_background {
+	background: rgb(250,235,221);
+}
+.block-color-yellow_background {
+	background: rgb(251,243,219);
+}
+.block-color-teal_background {
+	background: rgb(221,237,234);
+}
+.block-color-blue_background {
+	background: rgb(221,235,241);
+}
+.block-color-purple_background {
+	background: rgb(234,228,242);
+}
+.block-color-pink_background {
+	background: rgb(244,223,235);
+}
+.block-color-red_background {
+	background: rgb(251,228,228);
+}
+
+.checkbox {
+	display: inline-flex;
+	vertical-align: text-bottom;
+	width: 16;
+	height: 16;
+	background-size: 16px;
+	margin-left: 2px;
+	margin-right: 5px;
+}
+
+.checkbox-on {
+	background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Crect%20width%3D%2216%22%20height%3D%2216%22%20fill%3D%22%2358A9D7%22%2F%3E%0A%3Cpath%20d%3D%22M6.71429%2012.2852L14%204.9995L12.7143%203.71436L6.71429%209.71378L3.28571%206.2831L2%207.57092L6.71429%2012.2852Z%22%20fill%3D%22white%22%2F%3E%0A%3C%2Fsvg%3E");
+}
+
+.checkbox-off {
+	background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Crect%20x%3D%220.75%22%20y%3D%220.75%22%20width%3D%2214.5%22%20height%3D%2214.5%22%20fill%3D%22white%22%20stroke%3D%22%2336352F%22%20stroke-width%3D%221.5%22%2F%3E%0A%3C%2Fsvg%3E");
+}
+	
+</style></head><body><article id="cd114651-6e97-40ce-995b-7070ae9784de" class="page sans"><header><h1 class="page-title">확장 가능한, 해시에 기반한 CRUSH</h1><table class="properties"><tbody><tr class="property-row property-row-created_time"><th>Created</th><td><time>@Dec 13, 2019 6:13 PM</time></td></tr><tr class="property-row property-row-text"><th>Page</th><td>19 ~ 42</td></tr></tbody></table></header><div class="page-body"><p id="22a827de-5f2e-4be5-803e-8fe937f97b8a" class=""> 대부분의 스토리지 시시스템이 백엔드 스토리지에 데이터를 쓴 후, 데이터가 디바이스간 다시 이동하는 경우는 거의 없습니다. 데이터 분배가 완벽하게 균형을 잡더라도, 시간이 지남에 따라 새로운 장치가 계속 추가되고, 오래된 장치가 종료되면서 데이터의 균형이 다시 잡히게 됩니다. 이 상황은 특히 대규모 분산 스토리지 시스템에서 일반적입니다.</p><p id="13914207-e674-4b61-ab4d-9e8417d7284e" class="">해결책은 데이터를 충분히 작은 단위로 분할한 다음 모든 저장장치에 데이터를 완전히 무작위로 배포하는 것입니다. 이렇게 할 때, 시스템이 충분히 오래 실행되면 모든 장치의 공간 비율이 균형적이게 됩니다. 새 장치가 추가되면 이전의 다른 장치에서 데이터가 임의로 마이그레이션 됩니다. 마찬가지로, 이전 장치가 실패로 인해 종료되면 원래 데이터가 다른 일반 장치로 임의로 마이그레이션 됩니다. 이런 방식으로 전체 시스템은 항상 동적인 밸런싱 프로세스를 수행함으로 모든 유형의 토폴로지 변경에 적용할 수 있습니다. 또한 모든 데이터 (File, Block 일수 있음) 가 여러 조각으로 나뉘어 다른 저장 장치에 기록되므로 대규모 분산 저장 시스템에서 가능한 최대 I/O 동시성을 얻을 수 있습니다. 또한, 대역폭이 증가하게 됩니다. </p><p id="6c4cb828-2675-425a-9860-4a039981d924" class="">일반적으로 해시 기능을 사용하면, 위 목적을 달성할 수 있지만, 실제 응용 프로그램에서는 두가지의 문제를 해결해야 합니다. </p><ul id="7a2d8372-5e44-40e7-a2d8-55434feffaad" class="bulleted-list"><li>시스템의 저장 장치 수가 변경되면, 가능한 빨리 시스템이 균형을 복원하도록 데이터 마이그레이션 양을 최소화 해야함</li></ul><ul id="fedfc531-a554-474e-be92-b45a7ea585a2" class="bulleted-list"><li>대규모 (PB 수준 이상) 분산 스토리지 시스템의 데이터는 일반적으로 여러 백업이 포함되어 있고, 이러한 백업을 합리적으로 분배하여 데이터를 최대한 안정적으로 만들어야 함</li></ul><p id="cb582c88-0f34-4b0f-bf43-24ada7635a5d" class="">따라서 일반적인 해시 함수를 확장하여 위 문제를 해결할 수 있고, Ceph 에서는 CRUSH (Controlled Replication Under Scalable Hashing) 이라고 합니다.</p><p id="adea0833-9dcf-4168-ad6f-7cb63dedfe01" class="">이름에서 알 수 있듯이, CRUSH 는 해시 기반의 데이터 배포 알고리즘입니다. 중앙 집중화된 테이블 조회를 피하고 데이터가 있는 스토리지 장치를 언제 어디서나 계산하고 데이터와 직접 통신할 수 있습니다. CRUSH 는 여러 레플리케이션 전략을 지원하고, Replication 을 다른 영역에 있는 스토리지 장치에 매핑하여 확장성, 성능 및 안정성이 요구되는 대규모 분산 스토리지 시스템에 특히 적합합니다.</p><p id="17a42d73-da40-4693-98ec-510809f5fce8" class="">
+</p><p id="e606871e-07c5-45ef-afb7-600b98163710" class="">이 장에서는,</p><ul id="b069b50b-c6f2-4d32-9831-9a4b642adf6d" class="bulleted-list"><li>CRUSH 가 해결해야 할 문제를 소개하고, CRUSH-straw 의 가장 중요한 기본 선택 알고리즘과 개선된 버전인 straw 2 를 소개합니다.</li></ul><ul id="0d9189ad-9d99-41ad-9772-198a437a72d6" class="bulleted-list"><li>기본 알고리즘 분석을 완료한 후, 복잡한 계층 구조로 실제 클러스터로 확장하는 방법을 소개합니다. 이 목적을 달성하기 위해, 먼저 클러스터 토폴로지 및 데이터 배포 규칙을 소개한 다음, CRUSH 의 완전한 구현을 알아봅니다.</li></ul><ul id="5fbf7680-8778-4e45-92be-758a4f86ab7c" class="bulleted-list"><li>마지막으로, 실제 어플리케이션에서는 클러스터 토폴로지가 끊임없이 변화하기 때문에, CRUSH 구성이 비교적 복잡합니다. 실제 사례를 결합하여 프로덕션 환경에서 다양한 데이터 배포 요구사항을 충족하기 위해 CRUSH 를 심도있게 커스텀하는 방법을 분석하고, 동시에 메뉴얼 조정 방법을 소개합니다. 다양한 요인으로 인해 프로덕션 환경에서 일반적으로 나타나는 데이터 분배 문제를 해결하는 방법에 대해서도 알아봅니다.</li></ul><p id="9d940cd6-be30-4900-a245-fa6e3e1cc6d0" class="">
+</p><h2 id="0b166d73-a582-41d0-90fb-7a3c23827b84" class="">2.1 straw 와 straw2 알고리즘의 소개</h2><p id="8f2ed8f0-e588-445a-afb8-f000417b0e28" class="">Ceph 은 원래 대규모 계층형 스토리지 네트워크를 관리하도록 설계되었으며, 네트워크 수준에 따라 재난 방지 수준이 다르므로, Failure Domain 이라고 부릅니다. 다음 그림은 일반적인 Ceph 클러스터의 계층 구조입니다.</p><figure id="336f17e1-1ad9-4cc7-8df1-1f984f972d01" class="image"><a href="CRUSH/Untitled.png"><img style="width:549px" src="CRUSH/Untitled.png"/></a><figcaption>그림 1-1) 전형적인 Ceph 클러스터</figcaption></figure><p id="7e89f493-1dd7-4279-8a64-15a0d7dc33d9" class="">그림 1-1 에서, 단일 호스트에는 여러 개의 디스크가 있고, 각 랙에는 여러 개의 호스트가 있으며, 독립적인 전원 공금 장치 및 네트워크 스위칭 시스템이 사용되므로 전체 클러스터를 랙 단위의 여러 Failure Domain 으로 나눌 수 있습니다. 높은 안정성을 달성하고 실제로 필요한 데이터의 여러 Replication 이 서로 다른 렉의 Master 디스크에 분산되므로 CRUSH 는 계층 기반의 깊이 우선 탐색 알고리즘이어야 합니다.</p><p id="0c2d8579-fb4d-4d1f-b9a2-a71210e5727b" class="">또한 위에서 언급한 계층 구조에서는 각 수준의 구조적 특성도 다르지만, 일반적으로 최상위 수준일 가능성이 높을수록 구조를 변경할 가능석이 적으며, 그 반대도 마찬가지입니다. 클러스터는 처음부터 끝까지 하나의 데이터 센터에 있지만, 시간이 지나면서 호스트나 디스크 수가 변경될 수 있으므로 CRUSH 는 특성에 따라 다른 레벨에 대해 다른 선택 알고리즘을 설정할 수 있어야 합니다. 이로써 글로벌 및 동적 최적화를 달성합니다.</p><p id="69a135b0-c9af-4cc3-9e84-34d2345107f4" class="">CRUSH 초기 구현에서 Sage Weil 은 총 4개의 서로 다른 알고리즘을 설계했으며, 이 알고리즘은 더 복잡한 다른 알고리즘을 구현하기 위한 기초이며, 표 1-1 에는 장점과 단점이 나와 있습니다.</p><p id="d040d6a2-692c-4fb0-b304-165237488e2f" class="">
+</p><div id="5530d7cc-1f73-4d59-a21a-9dc45432f3a6" class="collection-content"><h4 class="collection-title">표 1-1) 각 알고리즘의 추가 및 삭제에 의해 생성된 데이터 마이그레이션 양을 비교하여 각 알고리즘의 품질 판단</h4><table class="collection-content"><thead><tr><th>비고</th><th>unique</th><th>list</th><th>tree</th><th>straw</th></tr></thead><tbody><tr id="970e3424-127c-43b9-a6e3-cf3be93bde83"><td class="cell-title"><a href="https://www.notion.so/970e3424127c43b9a6e3cf3be93bde83">시간 복잡도</a></td><td class="cell-?5{S">O(1)</td><td class="cell-Tyl?">O(N)</td><td class="cell-E7.P">O(logN)</td><td class="cell-K~QL">O(N)</td></tr><tr id="5d9ea56c-29e7-4516-979a-6360c0b1c32b"><td class="cell-title"><a href="https://www.notion.so/5d9ea56c29e74516979a6360c0b1c32b">추가</a></td><td class="cell-?5{S">부족</td><td class="cell-Tyl?">최고 좋음</td><td class="cell-E7.P">좋음</td><td class="cell-K~QL">최고 좋음</td></tr><tr id="437bff96-3b0d-4747-ac7d-b2c94f3c511b"><td class="cell-title"><a href="https://www.notion.so/437bff963b0d4747ac7db2c94f3c511b">삭제</a></td><td class="cell-?5{S">부족</td><td class="cell-Tyl?">부족</td><td class="cell-E7.P">좋음</td><td class="cell-K~QL">최고 좋음</td></tr></tbody></table></div><p id="0acd0dbf-66da-4c35-b800-9ac4d4b5820b" class=""> </p><p id="f19b821e-607d-422e-852d-17615a03115b" class="">표 1-1 에서 볼 수 있듯이 고유한 알고리즘은 시간 복잡도는 가장 좋지만, 구조적 변화에 최악의 능력을 가지고 있으며, straw 알고리즘은 시간 복잡도는 떨어지지만 구조적 변화에는 최상의 능력을 가지고 있습니다. 스토리지 시스템에서 데이터의 폭발적인 증가 (추가) 나 Disk Failure (삭제) 는 일반적인 상황이기 때문에, 대부분의 경우 straw 알고리즘이 좋습니다. 프로덕션 환경에서는 나머지 세 개의 알고리즘은 쓸모가 없으므로 straw 알고리즘을 분석합니다.</p><p id="0a0a72d4-aa2e-46da-93d5-30bb72bfacc8" class=""> straw 알고리즘은 표본의 크기가 충분히 크면 결국 모든 요소가 선택될 확률이 동일하므로 데이터가 다른 요소 간에 고르게 분산됩니다. 그러나, 초기 단계에서 클러스터가 아무리 잘 설계되더라도, 스토리지 디바이스는 시간이 지남에 따라 용량차이가 나게 됩니다. 그래서 CRUSH 알고리즘 가중치에 추가 변수를 도입하여 이 차이를 반영하고 Weight 이 큰 장치가 더 많은 데이터를 가지도록 해야 합니다. 이렇게 함으로서 데이터를 합리적으로 분산시킬 수 있게 됩니다.</p><p id="18ed73ef-9ee7-4c11-9cc0-f74727bc7dac" class="">straw 알고리즘의 실행 결과는 고정 입력, ID, Weight 의 세가지에 따라 달라지며, 번호는 임의 시드의 역할을 수행하므로 고정된 입력에 대해서는, straw 알고리즘은 Weight 에 의해서만 영향을 받게 됩니다. straw 알고리즘은 또한, Element 가 추가될 때, 일부 원래 Element 데이터를 새로 추가된 Element 에 무작위로 다시 매핑합니다. 이는 삭제 시에도 마찬가지입니다. 이렇게 straw 알고리즘은 Element 의 모든 데이터를 임의로 다른 Element 에 다시 매핑하므로, Element 의 추가 또는 삭제 여부에 관계없이 두 Element (서로 관계없는 두 Element) 간에 데이터가 마이그레이션되지 않습니다.</p><div id="59d72520-6ba3-47c4-90d4-80713d3136dc" class="column-list"><div id="495105c3-a5b2-4517-ab53-77145f08a808" style="width:50%" class="column"><p id="17440a89-e9fb-42ef-9acb-016288669daa" class="">이론적으로는 straw 알고리즘이 완벽하지만, 8년 간 Ceph 의 인기가 높아짐에 따라 사용자는 새로운 OSD 가 클러스터에 추가되거나 OSD 가 삭제될 때마다 관련없는 데이터 마이그레이션이 발생하는 것에 대해 커뮤니티에 계속 보고했습니다. 이에 따라 Sage 는 기존의 straw 알고리즘 구현체를 다시 검사했습니다. 원래의 straw 알고리즘의 pseudo code 는 다음과 같습니다. </p><p id="b20f6990-6144-4cf4-ab83-0014f09217c4" class="">
+</p><p id="4a2fc8d4-1186-412c-88bb-6a3b421a1367" class="">
+</p></div><div id="8a6c1995-a00b-4086-bd85-4168511737fb" style="width:50%" class="column"><figure id="8778ec06-f65c-49c7-8709-51736da61a4a" class="image"><a href="CRUSH/Untitled%201.png"><img style="width:482px" src="CRUSH/Untitled%201.png"/></a></figure></div></div><p id="318b2413-e588-4a9c-a732-7665dabe52f8" class="">선택 알고리즘의 결과는 input, random factor (r), item_straw 에 의해 계산되는 sign length 에 의존하며, item_straw 는 Weight 에 의해 계산되는 것을 알 수 있습니다.</p><figure id="b0a81f96-e605-486d-85f4-fb4fea932bc5" class="image"><a href="CRUSH/Untitled%202.png"><img style="width:923px" src="CRUSH/Untitled%202.png"/></a></figure><p id="0b588536-29ab-4a70-ae54-2af87a5d6893" class="">원래의 straw 알고리즘 구현에서, 모든 Element 는 Weight 에 따라 역순으로 배열되며, 각 요소의 item_straw 는 하나씩 계산됩니다. 계산 과정에서 현재 Element 와 이전 및 다음 Element 간의 weight 차이는 다음 Element 계산에 따라 계속 누적되어 다음 Element 의 item_straw 을 계산하기 위한 베이스로 사용됩니다. 따라서 원래 구현에서 straw 알고리즘의 최종 선택 결과는 각 요소의 weight 뿐만 아니라 세트의 다른 element 의 가중치에도 의존하므로 Element 가 추가되거나 삭제될 때마다 발생합니다. 이것이 현재 관련없는 데이터의 마이그레이션이 발생하는 이유입니다. </p><p id="73dbe889-ac8a-4255-b2d1-ff6cdbb064f1" class="">
+</p><div id="fa56de1c-d4f0-45cc-8c58-f01e5b8a265c" class="column-list"><div id="c309d9b9-8042-43a6-9484-ceec258254cc" style="width:50%" class="column"><p id="6ec6aa1f-9aab-48ed-a8f5-37b3a5bbbd79" class="">Sage 는 straw 2 라고 불리우는 straw 를 수정한 새로운 알고리즘을 도입했습니다. 수정된 straw2 알고리즘은 signature 를 계산할 때 Element 자체의 Weight 만 사용하므로 관련없는 데이터의 마이그레이션을 피하고, Sage 의 원래 의도를 완벽하게 반영할 수 있습니다. pseudo code 는 다음과 같습니다. </p><p id="85341da4-58b9-46ee-947a-50dc270fcec7" class="">
+</p></div><div id="b67f6dde-7b36-4906-bb39-1c4fe24c44fd" style="width:50%" class="column"><figure id="36ca7545-ba7d-4402-953a-4c4e7b607a92" class="image"><a href="CRUSH/Untitled%203.png"><img style="width:403px" src="CRUSH/Untitled%203.png"/></a></figure></div></div><p id="9a54f1b6-5e62-4831-9dcd-0f601e3ebf20" class="">
+</p><h2 id="c2eba517-f6f9-4eac-9f95-fa194f2230dc" class="">2.2 자세한 CRUSH 알고리즘</h2><p id="2b1c794d-be8e-4c0a-8000-a30579e19960" class="">CURSH 알고리즘은 Weight 을 기준으로 모든 스토리지 디바이스에 데이터를 매핑합니다. 이 프로세스는 cluster-map 이라는 클러스터 토폴로지에 의해 제어됩니다. 다른 Placement rule 공식에 의해 다른 데이터 분산 전략이 구현됩니다. 실제로 이는 Replica 최대 수, Disaster Tolerance 레벨 등을 포함한 일련의 사용자 정의 제약 조건입니다. 예를들어, 그림 1-1 의 클러스터에서, Placemnet rule 을 사용하여 세 개의 데이터 Replica 를 미러링 할 수 있습니다. (이는 기본 Ceph 데이터 Replication 전략이기도 합니다.) 이는 모든 복제본의 전원이 동시에 꺼지고 비지니스 중단이 발생하지 않도록 다른 랙에 있는 호스트 디스크에 기록됩니다.</p><p id="17afa670-dee2-460a-b52d-1c021770ed9f" class="">어떤 input X 에 대해서, CRUSH 는 n 개의 서로 다른 스토리지 객체 (예: 디스크) 를 포함하는 세트를 입력합니다. CRUSH 를 계산하는 동안 clsuter map 과 placement rule 만 해시 함수의 입력으로 사용됩니다. (일반적으로, placement rule 은 쉽게 변경되지 않습니다.) 동시에, 사용된 해시 함수는 pseudo-random 이므로, CRUSH 의 각 스토리지 객체를 선택할 확률은 독립적입니다. (하지만, 복제 전략의 변경이 독립성을 변경합니다.) 이로서 데이터가 클러스터 전체게 고르게 분산되게 됩니다.</p><h3 id="43156379-caac-448a-8782-ba4873ddb4fa" class="">2.2.1 클러스터의 계층 설명 - Cluster Map</h3><p id="d2f2ba18-52f3-4385-a098-00c2006b4d42" class="">Cluster map 은 Ceph 클러스터 토폴로지에 대한 논리적인 설명입니다. 실제로 Ceph 클러스터는 일반적으로 트리와 같은 계층적 관계를 가지므로, cluster map 은 트리와 같은 데이터 구조를 사용하여 구현할 수 있습니다. 각 리프 노드는 장치라고 하는 실제 최소 물리적 스토리지 장치 (예: 디스크) 이며, 중간 노드들을 통칭하여 Bucket 이라고 합니다. Root 는 클러스터의 Root 입니다.</p><p id="b2c65d05-78e4-40e2-bfda-981a91b8bb1b" class="">각 노드는 클러스터에서 위치와 계층 구조 식별을 위한 고유한 unique id 및 type 을 가지지만, leaf 노드, 즉 디바이스는 음이 아닌 id 를 가짐으로서 데이터를 전달하는 최종 디바이스임을 나타냅니다. </p><p id="cc216816-b87c-4c18-8e88-36687332d70e" class="">노드의 Weight 은 CRUSH 의 선택 프로세스를 조정하여 데이터 분배를 보다 합리적으로 만드는데 사용되며, 상위 노드의 가중치는 모든 하위 노드의 가중치의 합계입니다.</p><figure id="38f92f81-21f0-4c16-8045-8c86099e528b" class="image"><a href="CRUSH/Untitled%204.png"><img style="width:835px" src="CRUSH/Untitled%204.png"/></a><figcaption>표 1-2) Cluster Map 의 일부 공통 노드의 유형</figcaption></figure><p id="99bbe276-14fb-4124-92a7-3f6e39846895" class="">위 표의 유형은 고정되어 있는 것이 아니라, 자신의 선호에 따라 수정 및 조정할 수 있습니다. 모든 디스크 사양이 동일하다고 가정하면, (Weight 이 동일) 그림 1-2 처럼 그림 1-1 에 표시된 클러스터에 대한 cluster map 을 제공할 수 있습니다.</p><p id="d8bed723-8ae0-4580-ab7f-12ca3427b151" class="">트리의 각 노드는 Bucket 이며 (디바이스도 Bucket 으로 추상화됨) 각 Bucket 은 자식의 수만 가지고 있습니다. 이때, 항목이 비어 있음을 쉽게 알 수 있습니다.  </p><figure id="85709c37-30c5-4de6-9e54-7751ab2cd8d2" class="image"><a href="CRUSH/Untitled%205.png"><img style="width:706px" src="CRUSH/Untitled%205.png"/></a><figcaption>그림 1-2) 그림 1-1 클러스터의 Cluster Map</figcaption></figure><h3 id="b9e98162-cba5-4c1d-8b64-1fc5b92d7d52" class="">2.2.2 데이터 배포 전략 - Placement Rule</h3><p id="96922596-732d-472b-b0e7-6c9e0dce7f7d" class="">Cluster map 을 사용하여 해당 클러스터의 토폴로지를 설정한 후, Placement rule 을 정의하여 데이터 매핑을 완료할 수 있습니다. </p><p id="69b819bc-bed8-408e-b463-84959dfbad74" class="">각 placement rule 에는 여러 오퍼레이션이 포함될 수 있습니다. 다음 세 가지 유형의 작업이 존재합니다.</p><ol id="2de08775-06f8-4962-b50f-14dcdef55bf9" class="numbered-list" start="1"><li>take<p id="8aac012a-f5d9-44cf-b8d6-7d36c77301a4" class="">Take 는 cluster map 에 지정된 버킷 수를 선택하고, 후속 단계의 입력으로 사용합니다. 예를들어, 시스템의 default Placement rule 은 항상 cluster map 의 Root 노드에서 입력으로 시작합니다.</p></li></ol><ol id="ea642e3a-ba67-4489-8cc0-4a3ffef1c94c" class="numbered-list" start="2"><li>select<p id="ae16e3c1-bc6c-4ff3-8dd5-95f0307418a5" class="">Select 는 input bucket 에서 지정된 type 과 아이템 수를 임의로 선택합니다. Ceph 은 현재 두가지 백업 전략을 지원합니다. Rep 와 EC 에 따라 firstn 과 indep 의 두가지 선택할 수 있는 알고리즘이 있습니다. 두 알고리즘은 모두 깊이 우선 탐색이며 큰 차이는 없습니다. 주요 차이점은, firstn 은 <code>[1, 2, 4]</code> 형식을 리턴하고, indep 은 해당 항목이 있는 경우 항상 필요한 항목 수를 리턴하여 채웁니다. 따라서 다음과 같은 형태를 리턴합니다. <code>[1, 2, CRUSH_ITEM_NONE, 4]</code></p><p id="6c9315e1-a0f2-48c9-9f49-f631acb2d512" class="">Select 를 실행하는 동안, 선택된 아이템이 결함이 있거나 이전에 선택된 아이템과 충돌 등으로 실패하면, Select 가 다시 실행됩니다. 따라서 무한 루프를 피하기 위해서 Maximum 실행 횟수를 지정해야 합니다.</p></li></ol><ol id="c097c1d0-d0c8-4b4e-a3d2-305cc85c4d74" class="numbered-list" start="3"><li>emit<p id="aa2268ab-2428-4a91-9f1f-5d3e3cc3c67c" class="">emit 은 최종 선택 결과를 상위 호출자에게 리턴합니다. </p><p id="fb530034-9940-4641-a561-d186dd2804cc" class="">
+</p></li></ol><p id="e81ff454-e200-4984-a422-52679511a638" class="">placement rule 에서 결정적인 역할을 하는 것은 select 라는 것을 알 수 있습니다. </p><p id="9523049c-4529-44bc-b4e2-e4c7e8e420b3" class="">Placment rule 을 단순화 하기 위해서, select 오퍼레이션도 역시 disaster domain 모델을 지원합니다. firstn 을 예로 들면, 만약 disaster recovery domain 모드라면, firstn 은 지정된 수의 leaf device 를 리턴하고, leaf device 가 서로 다른 disaster recovery domain 타입에 속해있는지 검사합니다.</p><p id="2a4b506c-91f5-4e6c-bce4-961b9ae52b2d" class="">그러므로, disaster domain mode 에서는, 가장 간단한 Placement rule 은 다음의 세 오퍼레이션을 포함합니다.:</p><pre id="c6a2fc4e-0f96-41e3-a115-f698a9b08bf7" class="code"><code>take(root)
+select(replicas, type)
+emit(void)</code></pre><p id="d5561425-1e6a-49d5-8a6a-862a3aff75bd" class="">위 select 오퍼레이션의 <code>type</code> 은 설정하려는 disaster domain 의 유형입니다. 예를들어, 도메인이 랙으로 설정된 경우, select 는 모든 선택된 Replica 가 다른 랙에 있는 호스트의 디스크에 있는지 검사합니다. 이는 호스트로 설정할 수도 있으며, 선택한 복제본이 다른 호스트의 디스크에 있음을 보장합니다.</p><p id="7b21b359-e86a-4784-b176-e7a63f8082b8" class="">
+</p><p id="67166eaf-91d5-4a30-bc38-5ef34abf1204" class="">&lt;알고리즘 생략&gt;</p><p id="605abb13-cabe-454e-bf35-6067058aebf7" class="">
+</p><p id="32c3d640-2ac8-41d1-8d06-e327455a56b7" class="">Select 를 할때 알고리즘 실행 결과는 입력으로 주어진 Object 의 식별자 x 와 랜덤 인자 r (해시의 seed)입니다. x 는 고정되어 있기 때문에, selection 에 실패하면 재시도할때에는 다른 결과를 출력하도록 r 를 재조정합니다. r 은 선택할 복제본 수와 현재 시도 횟수에 의해 결정됩니다. 선택된 버킷을 계속 기록하면서 실패하면 선택하지 않는 방식으로 충돌 가능성을 줄이도록 할 수 있습니다.</p><p id="87556b5f-f58e-4fb1-8741-1e27faffc98b" class="">
+</p><p id="1e726e10-8a62-450f-a3b8-78f30bb2b5b7" class="">이론적으로는 CRUSH 알고리즘은 모든 디스크에 데이터가 고르게 분산되어 있다는 사실을 보장하지만, 실제로는 다음과 같은 요소들이 존재합니다.</p><ul id="c09b3b3a-a2f8-4791-911e-69d4d0c8ca0a" class="bulleted-list"><li>클러스터 크기가 작아 클러스터의 총 PG 수가 제한되어, CRUSH 입력의 샘플양이 충분하지 않음</li></ul><ul id="343428ca-ef2f-4aa4-8e6a-4153e85bded5" class="bulleted-list"><li>CRUSH 자체의 결함</li></ul><p id="7452ce1f-2588-4365-a1c4-0dc8c0c30083" class="">
+</p><p id="41efee09-c1fd-4704-8e29-1af15be27417" class="">실제 환경의 클러스터에서는 각 CRUSH Weight 을 OSD 용량 기준으로 조정해야 합니다. 각각의 OSD 용량에 따른 Weight 뿐만 아니라, Ceph 은 추가적인 가중치를 세팅합니다. 이를 reweight 이라 부릅니다. 알고리즘이 OSD 를 선택하면, reweight 에 기반하여 OSD 의 부하에 대한 테스트를 수행합니다.</p><p id="c8fe0b2b-8420-4b2a-90e5-ea57c7400aa7" class="">
+</p><p id="54244915-a802-4737-ac0c-83eb74dab711" class="">&lt;알고리즘 생략&gt;</p><p id="54f7f8ba-8912-4395-95a6-724718f09414" class="">
+</p><p id="c83c626f-e9aa-4889-a1df-157956586ed1" class="">OSD 의 reweight 이 높을수록, weight 테스트에 통과할 확률이 높습니다. (예를들어, 수동으로 OSD reweight 을 0x10000 으로 설정할 경우 통과 확률은 100%) 반대의 경우는 테스트 통과 확률이 낮기 때문에, 실제로는 과부화된 OSD reweight 을 낮추거나, 부하가 없는 OSD 의 reweight 을 증가시켜 데이터를 재분배 할 수 있습니다. 이를 통해 데이터 분배를 보다 합리적으로 만들 수 있습니다.</p><p id="f302e3ba-7170-4d26-a673-79cb605cf660" class="">이러한 테스트의 또다른 이점은, OSD 가 일시적으로 비활성화 되거나 영구적으로 삭제된 시나리오를 구별할 수 있다는 것입니다. 일시적으로 비활성화 될 경우 (예: 특정 시간 이상 디스크가 분리된 경우, Ceph 은 이 OSD 를 out 처리합니다.) 이 OSD 의 reweight 을 0으로 설정할 수 있습니다.</p><p id="deba77f8-2d03-42ef-b5d1-104f307e6649" class="">그러므로, weight 테스트는 후보 항목에서 해당 OSD 를 제거하는 데 사용되며, 그로 인해 이동되는 데이터는 다른 OSD 로 마이그레이션 되므로, OSD 가 정상으로 돌아오면 Weight 을 1로 재조정하여 다시 할당할 수 있습니다. 데이터가 다시 마이그레이션되고 OSD 의 오프라인 기간 동안 생성된 새 데이터는 마이그레이션 프로세스 중에만 동기화되어야 합니다. 즉, 증분 동기화만 필요합니다. 대신, OSD 가 삭제되면, 이를 삭제하기 위해서 동기화됩니다. OSD가 클러스터에 다시 추가 되더라도 클러스터 맵의 고유 번호가 변경되어 이전과 완전히 다른 데이터를 전달할 수 있도록 entry 가 삭제됩니다. </p><p id="0a0c888d-7f13-402e-af47-8756ec12dfe3" class="">초기화 할때 Ceph 은 각 OSD 의 가중치를 0x10000 으로 설정하므로, 위의 테스트는 CRUSH 의 최종 선택 결과에 영향을 미치지 않습니다. </p><p id="fbea40ab-c7c8-497e-b2f6-7d281c2ac73f" class="">
+</p><h2 id="4da3de5c-9b42-4e2b-9dbd-6a13680ca818" class="">2.3 CRUSH 조정</h2><p id="0ec4633e-e9b3-4096-a5a3-20584ae53cd4" class="">Ceph 설계에 따르면, 클라이언트 측 object 의 위치를 지정하는 것과 관련된 모든 시나리오는 CRUSH 를 기반으로 계산해야 하므로, CRUSH 의 계산 효율을 향상시키는 것이 중요합니다. CRUSH 를 조정하면 가능한 적은 계산 비용으로 성능을 향상시킬 수 있습니다.</p><p id="b18cc253-0f18-4ae8-86ff-b235aa2c0b96" class="">CRUSH 를 조정하는 가장 쉬운 방법은, 미리 만들어진 프로파일을 사용하는 것입니다. 그 명령은 다음과 같습니다. </p><pre id="ac3848c7-d781-4eb9-8874-fe886d650506" class="code"><code>ceph osd crush tuables {profile}</code></pre><p id="6ca6e09c-bffc-4d44-b9bf-93b2a41aa87c" class="">Luminous 버전 기준, 아래 나열된 대로 사전 정의된 템플릿이 존재합니다.</p><ul id="13733c3b-328e-4850-800a-8364195a5ab6" class="bulleted-list"><li>argonaut, bobtail, firefly, hammer, jewel, legacy, optimal, default</li></ul><p id="628080c7-1e9c-4a27-ba32-f097c3777318" class="">물론, 일부 특정 시나리오, (예: 클러스터가 크고 각 호스트의 디스크 수가 비교적 적은 경우) 에서 위의 템플릿을 사용하여 CRUSH 가 제대로 동작하지 않을 수 있으므로, 매개 변수를 수동으로 조절 해야합니다.</p><p id="06260216-1f5b-4b6e-9d2f-28b8f1fc90c3" class="">
+</p><h3 id="1250755b-01e2-477c-8eae-945c28ecc54d" class="">2.3.1 CRUSH 맵</h3><p id="f56cb98a-75db-49e0-b12b-b033b8f607a5" class="">커널 클라이언트에서도 사용해야 하기 때문에, CRUSH 계산 프로세스를 독립적으로 관리하기 위해 Ceph 은 클러스터 맵과 Placement rule 을 CRUSH 맵에 병함하여 구현합니다. </p><p id="58137940-471a-432f-9e4f-a11065f29b46" class="">일반적으로 CLI (Command-Line Interface)를 통해 다양한 CRUSH 구성을 온라인으로 쉽게 수정할 수 있으며 CRUSH 맵을 직접 편집하여 수행 할 수도 있습니다. 단계는 다음과 같습니다.</p><ol id="6b93b889-9a35-4b68-81f0-8247033bbdc1" class="numbered-list" start="1"><li>CRUSH 맵 추출<p id="4e5e05ec-0f9b-4e2a-b1ac-c9a10e8c9abd" class="">대부분의 경우, 클러스터가 성공적으로 생성된 후, CRUSH 맵이 시스템에서 자동으로 생성되며, 아래 명령으로 얻을 수 있습니다.</p><pre id="282f47f6-9b32-4ef8-ba22-89199cb9ee79" class="code"><code>ceph osd getcrushmap -o {compiled-crushmap-filename}</code></pre><p id="55fa3123-e55f-47f5-9269-7b275cb4996a" class="">위의 명령은 클러스터의 CRUSH 맵을 지정된 파일로 출력합니다. 물론 테스트 또는 다른 목적으로 CRUSH 맵을 수동으로 만들 수도 있습니다. 명령은 다음과 같습니다.</p><pre id="8a824a6d-4a7a-4ad4-937e-ed7dde56f245" class="code"><code>crushtool -o {compiled-crushmap-fLlename} __build _ --num-osds Nlayerl...</code></pre><p id="677ae5a0-87d2-4795-9145-5ebc6eb6115d" class="">지정된 수준에 균등하게 분배되며, 각 계층은 &lt;name, algorithm, size&gt; 형식 (여기서 size 는 각 계층의 버킷 아래에 있는 항목의 수를 나타냄) 으로 지정해야 합니다. (낮은 노드에서 루트노드 순서) 예를 들어, 다음 명령을 사용하여 그림 2-2에 표시된 클러스터의 CRUSH 맵 (osd-&gt; host-&gt; rack-&gt; root)을 생성 할 수 있습니다.</p><pre id="46e8a559-4c07-46f0-810b-3ad8bcda9e77" class="code"><code>crushtool -o mycrushmap --build --num-osds 27 host straw2 3 rack straw2 3 root uniform 0</code></pre><p id="492d86d1-6153-4802-9177-bef32809fe8c" class="">위 두가지 방법으로 입력된 CRUSH 맵은 컴파일되어 입력되며, 디컴파일 후 텍스트 모드에서만 편집 가능합니다.</p></li></ol><ol id="32f73aa4-af4f-4c5d-9886-6dbfa9ff702f" class="numbered-list" start="2"><li>CRUSH 맵 디컴파일<p id="313b021a-4f84-4df8-a3cf-63ec46305e70" class="">아래와 같이 실행합니다:</p><pre id="a3ad9448-b6a1-4ae5-9510-5de67ba3faca" class="code"><code>crushtool -d {compiled-crushmap-filename} -o {decompiled-crushmap-filename}</code></pre><p id="c5dbddf6-5884-4602-b167-94f120e6742b" class="">1단계의 CRUSH 맵 출력을 직접 편집 가능한 텍스트 형식으로 변환할 수 있습니다.</p><pre id="03d63cf0-2f32-402e-a97b-4705aaff488c" class="code"><code>crushtool -d mycrushmap -o mycrushmap.txt</code></pre></li></ol><ol id="1e58e36b-1873-4830-8b7b-756a0db9bd58" class="numbered-list" start="3"><li>CRUSH 맵 편집<p id="e6aafcf1-7794-4b2c-8491-b77b5735e858" class="">디컴파일된 CRUSH 맵을 가져온 후, 텍스트 형식으로 직접 열고 편집할 수 있습니다.</p><pre id="c630b9bd-4262-4654-bd02-255e57a8de10" class="code"><code>vi mycrushmap.txt
+# begin crush map
+tunable choose_local_tries 0
+tunable choose_local_fallback_tries 0
+tunable choose_total_tries 50
+tunable chooseleaf_descend_once 1
+tunable chooseleaf_vary_r 1
+tunable straw_calc_version 1</code></pre><p id="151ba64e-3d11-430a-bbdd-37ccc363a1df" class="">또한 Placement rule 도 수정할 수 있습니다.</p><pre id="225b9b9d-b1e8-4773-af8c-0928957f8a97" class="code"><code>vi mycrushmap.txt
+# rules
+rule replicated—ruleset {
+	ruleset 0
+	type replicated
+	min_size 1
+	max—size 10
+	step take root
+	step chooseleaf firstn 0 type host
+	step emit
+}</code></pre><p id="6d7fc703-7ffa-401b-977e-988521749d47" class="">위 placement rule 의 옵션의 의미는 아래와 같습니다.</p><ul id="f2f5f821-e5ff-4f4a-b5cd-bc22fee32f90" class="bulleted-list"><li><code>ruleset</code>: rule 의 고유 번호, 다른 스토리지 Pool 은 다른 ruleset 을 사용할 수 있습니다. 이는 각 pool 이 여러 ruleset 을 통해 보다 유연한 데이터 분배 전략을 달성할 수 있도록 합니다. 그러나, placement rule 에는 여러 작업이 포함될 수 있으므로, luminous 버전 부터는 더이상 사용되지 않습니다 ㅡㅡ; (더 단순한 룰 컨셉으로 통합됨)</li></ul><ul id="61d58028-a007-41fa-8ab9-7153a3ea1fc3" class="bulleted-list"><li><code>type</code>: copy 전략, replicated 와 erasure 를 포함함</li></ul><ul id="2bda1fc3-45fc-4113-b086-f5c5d202de4f" class="bulleted-list"><li><code>step XX</code>: 작업 유형은 전 섹션에서 소개되었습니다. <figure id="5a8c0275-113f-4270-9956-0be5f66d2fdd" class="image"><a href="CRUSH/Untitled%206.png"><img style="width:900px" src="CRUSH/Untitled%206.png"/></a></figure></li></ul><p id="53a7b67d-f9cd-42fb-91db-b4e47237bc42" class="">따라서 위의 placment rule 은 &quot;레플리케이션 전략을 채택하고, copy 가 다른 호스트의 디스크에 있어야 합니다&quot; 를 의미합니다. </p></li></ol><ol id="2258d3d6-351d-4cd0-9f53-671e82ed5079" class="numbered-list" start="4"><li>CRUSH 맵 컴파일<p id="273c9fb3-8e8b-425c-b42e-20c06c043163" class="">텍스트 형식으로 편집한 CRUSH 맵은 Ceph 에 인식시키기 위해 컴파일해야 합니다. 아래 명령으로 실행합니다.</p><pre id="6105eb12-c886-46cd-8b36-6c1369584c4e" class="code"><code>crushtool -c {decompiled-crush-map-filenaine} -o {compiled-crush-map-filename}</code></pre></li></ol><ol id="7a591f51-800b-47d6-845d-e8699fde5d9e" class="numbered-list" start="5"><li>Mock Test<p id="b6bf7a09-61a7-40f2-bd10-f0e994532fb8" class="">새로운 CRUSH 맵이 적용되기 전에 시뮬레이션을 수행하여 해당 수정이 예상과 일치하는지 확인할 수 있습니다. 예를들어 다음 명령을 사용하여 input range [0, 9], replication 3, rule number 0 의 ruleset 의 매핑 결과를 출력할 수 있습니다.</p><pre id="b6a6a6ec-14d0-409c-b320-338a32107fd9" class="code"><code>crushtool -i mycrushmap --test --min-x 0 --max-x 9 --num-rep 3 --ruleset 0 --show_mappings
+CRUSH rule 0 x 0 [19,11,3]
+CRUSH rule 0 x 1 [15,7,21]
+CRUSH rule 0 x 2 [26,5,14]
+CRUSH rule 0 x 3 [8,25,13]
+CRUSH rule 0 x 4 [5,13,21]
+CRUSH rule 0 x 5 [7,25,16]
+CRUSH rule 0 x 6 [17,25,8]
+CRUSH rule 0 x 7 [13,4,25]
+CRUSH rule 0 x 8 [18.5.15]
+CRUSH rule 0 x 9 [26.3.16]</code></pre><p id="c0b8ad89-4b06-44db-a633-9ff6e76a1d10" class="">통계 결과의 분포를 요약할 수 도 있습니다. (여기서 입력은 [0, 100000]):</p><pre id="1e72972a-616f-4910-bfb2-661d3a5eec7d" class="code"><code>crushtool -i mycrushmap --test --min-x --max-x 100000 --num-rep 3 --ruleset 0 --show-utilization</code></pre><figure id="61aa2af5-c8dd-4ca7-a0b5-c643fd4fc15b" class="image"><a href="CRUSH/Untitled%207.png"><img style="width:624px" src="CRUSH/Untitled%207.png"/></a></figure></li></ol><ol id="822d53c7-0d1b-4c20-a010-1656c9f5ff6f" class="numbered-list" start="6"><li>클러스터에 적용<p id="44d41a01-bc9e-4184-8e3f-50cb10077c67" class="">새 CRUSH 맵이 완전히 검증된 후 클러스터에 주입하여 적용할 수 있습니다. 다음 명령을 실행합니다.</p><pre id="df89baf0-ee15-4f5a-88b9-f0f04bad9b9e" class="code"><code>ceph osd setcrushmap -i {compiled-crushmap-filename}</code></pre></li></ol><p id="6a4bc85b-3cbd-437d-9617-393d28cd9102" class="">
+</p><h3 id="d12107a1-91fc-411a-ac7e-a37fa6a12734" class="">2.3.2 Custom CRUSH 룰</h3><p id="a34388d2-7057-4aa8-9d37-be911e61c900" class="">이전 섹션에서, CRUSH 맵을 편집하는 일반적인 방법이 소개되었으며, 이 섹션에서는 특정 요구에 맞게 CRUSH 룰을 유연하게 조정하는 방법에 대해 설명합니다. (그림 2-1 을 예로 설명합니다.) 가장 일반적인 시나리오는 fault domain 을 업그레이드 하는 경우입니다. 예를들어, default fault domain 이 host 레벨일 때, rack 으로 업그레이드 해야 하는 경우가 있습니다. 아래와 같이 올바른 ruleset 을 수정합니다. (물론, 새로운 ruleset 을 만들 수도 있습니다.)</p><p id="7f3ccc40-2a8e-43aa-ab86-5234843ad7dc" class="">테스트 결과는 오른쪽과 같습니다.</p><div id="5eb14a56-7119-4466-9c04-4be54530b323" class="column-list"><div id="57679359-193d-45b3-9a2f-980057e47014" style="width:37.5%" class="column"><figure id="204c13ad-67bf-4b9e-9876-e0ac126acb8a" class="image"><a href="CRUSH/Untitled%208.png"><img style="width:432px" src="CRUSH/Untitled%208.png"/></a></figure></div><div id="4aba43ec-ce4f-4adb-b782-89d00a90cb3f" style="width:62.5%" class="column"><figure id="49e7f34d-0320-417b-bcb2-aac0e5a3cd5a" class="image"><a href="CRUSH/Untitled%209.png"><img style="width:596px" src="CRUSH/Untitled%209.png"/></a></figure></div></div><p id="bdaedbad-6249-4361-a516-260120934099" class="">모든 복제본이 이제 다른 rack 의 OSD 에 있음을 알 수 있으며, OSD 선택을 특정 rack 으로 제한할 수 도 있습니다.</p><div id="d5eb6e05-7e2a-4833-96c0-e00f606db35c" class="column-list"><div id="4cd2fffe-7819-4f60-a97b-af53a9fd5769" style="width:43.75%" class="column"><figure id="b981d04c-86f5-4f3e-8e33-efa546d17a69" class="image"><a href="CRUSH/Untitled%2010.png"><img style="width:480px" src="CRUSH/Untitled%2010.png"/></a></figure></div><div id="e359b619-6bc6-4421-b735-c0599683e6bc" style="width:56.25%" class="column"><figure id="3dc892de-92c9-4d29-a69c-c0ffc6124ee1" class="image"><a href="CRUSH/Untitled%2011.png"><img style="width:614px" src="CRUSH/Untitled%2011.png"/></a></figure></div></div><p id="9b417928-0e76-4b63-9716-7fcd7a99abb0" class="">현재 모든 복제본이 rack 2 의 OSD 로 제한되었습니다. (OSD 18 ~ 26) OSD (리프 노드) 를 제외한 나머지 계층적인 관계는 가상의 것이라는 것을 알고 있어야 합니다. (실제로 존재하든 말든)</p><p id="13409138-e72d-4247-90db-60e8239f8bd7" class="">예를 들어, 아래의 극단적인 예에서, 모든 복제본이 3개의 특정 OSD (0, 9, 18) 에 제한되도록 새로운 가상 호스트를 만들 수 있습니다.</p><div id="efc1acd0-e472-4bc0-b68b-3e77227d99d9" class="column-list"><div id="6c78fa58-3e62-492b-9ea9-0483a401e3ca" style="width:43.75%" class="column"><figure id="576f6d3e-de1e-48cb-96a6-3ddc59dfe53e" class="image"><a href="CRUSH/Untitled%2012.png"><img style="width:479px" src="CRUSH/Untitled%2012.png"/></a></figure></div><div id="f00df8ec-af69-497c-a0b6-548039f3fe1c" style="width:56.25%" class="column"><figure id="7d201f1f-7274-4c02-ab1b-5ed435371249" class="image"><a href="CRUSH/Untitled%2013.png"><img style="width:360px" src="CRUSH/Untitled%2013.png"/></a></figure></div></div><p id="0bb60c16-03f3-4c16-adb3-637b461a1a69" class="">결과는 아래와 같이 됩니다.</p><figure id="70755ec7-1473-48bb-8829-de383e385f80" class="image"><a href="CRUSH/Untitled%2014.png"><img style="width:864px" src="CRUSH/Untitled%2014.png"/></a></figure><p id="86aa1297-cacb-427b-be02-b8270ae9693e" class="">상기 예를 적절히 조합함으로써보다 복잡한 예를 얻을 수 있으며, 여기서는 반복하지 않을 것입니다.</p><p id="113535f5-7629-476b-a075-1475d855eac2" class="">
+</p><h2 id="f775f1d5-900d-4980-b12b-287c40409d9a" class="">2.4 데이터 리밸런싱</h2><p id="34e41191-18a1-479b-be75-78de4c55bfaa" class="">해시를 기반으로 무작위로 데이터를 쓰는 전략은 Ceph 클러스터의 하나의 디스크가 가득 찻을 때, 전체 클러스터가 full 로 표시되며 모든 클라이언트가 데이터를 쓰지 못하도록 만듭니다. </p><p id="dee3104b-c652-457b-bed6-00d0ffda637f" class="">위의 공간 제어 전략으로 인한 주요 문제는 다음과 같습니다. </p><p id="c528a2d3-bea9-47a7-9ec1-15b0b3183d5b" class="">프로덕션 환경에서 Ceph 클러스터의 공간 활용률은 일반적으로 높지 않습니다. 평균값은 약 23% 로, 극단적인 경우 더 낮을 수 있으며, 기존 스토리지에 비해 Ceph 으로 전환하기 위한 공간 비용이 높습니다. 그러므로 위의 문제를 해결하려면, 클러스터의 모든 OSD 공간 사용이 가능한 일관되도록 클러스터의 데이터 분배를 조정해야 합니다. 쉽게 간과할 수 있는 사실은, 각 OSD 공간 통계를 byte 로 세분화할 수 있지만, 모든 OSD 의 공간 사용량이 균형을 이루도록 하기 위해 bytes 나 object 를 사용하지 않고, 조정하기 위해서는 PG 만 사용한다는 것입니다. </p><p id="9aefc22c-52ec-4746-b3d4-9c0c7d0796b9" class="">PG 는 전체 클러스터를 균등하게 만들 가능성을 차단할 수 있으므로, 각 OSD 의 PG 수를 최대한 가깝도록 조정할 수 있는가? 의 질문에 대답하기 전에 왜 PG 가 고르지 않은지 연구해야 합니다. </p><div id="8bb824a1-97a5-4826-9f35-a76399be8af2" class="column-list"><div id="bf357391-7db9-4b87-9825-189a7f0d7303" style="width:50%" class="column"><p id="e4b63ea6-fad0-484c-a4e5-83216ba0fc8f" class="">pseudo-random 함수의 특성으로 인해 입력 샘플 사이즈가 충분히 커지게 되면, 출력 결과가 충분히 불연속적임을 보장할 수 있습니다. 즉, 백만 개의 object 가 10개의 PG 에 랜덤하게 매핑되면, 각 PG 에서 object 수의 편차가 1% 를 초과하지 않을 확률이 높습니다. 반대로, 샘플 크기가 작은 경우, (예, 100개의 PG 가 10개의 OSD 에 무작위로 매핑된 경우, 각 OSD 에 배포된 PG의 최종 수 ) 는 안좋은 상태에 도달할 수 있습니다.</p><p id="0929a044-ef76-4b8e-82b8-05440c9067cb" class="">오른 쪽 예제가 작은 클러스터의 PG 분포를 보여줍니다.</p><p id="6c5905d9-9b08-49b7-a615-5b7197d1c469" class="">
+</p></div><div id="53c53d5a-3ae3-4760-ad4d-7634a2a05757" style="width:50%" class="column"><figure id="86b4eb39-848a-4bf3-94b7-e224b46e8052" class="image"><a href="CRUSH/Untitled%2015.png"><img style="width:532px" src="CRUSH/Untitled%2015.png"/></a></figure></div></div><p id="094eac3a-03f8-444c-be45-69a3e555de33" class="">따라서 전체 클러스터의 객체 수가 충분하면 각 PG의 객체 수는 기본적으로 일관되게 보장 될 수 있습니다. 또한 각 OSD의 PG 수가 동일한 경우 이론적으로는 OSD에 의해 분배 된 객체의 수는 또한 균일 한 경향이있어서, 각 OSD의 공간 사용량이 균일 한 경향을 보장합니다.</p><figure id="47a89266-7469-4212-a078-e1758f2fe772" class="image"><a href="CRUSH/Untitled%2016.png"><img style="width:623px" src="CRUSH/Untitled%2016.png"/></a></figure><p id="023d388c-b915-497d-ab37-34f91f3960b5" class="">따라서 OSD 간 균형을 맞추기 위해서는 각 OSD 에 존재하는 PG 수를 크게 늘리면 되지만, 실제로는 각 OSD PG 수는 너무 클 수 없습니다. (예: Ceph 의 권장값은 단일 OSD 가 100 개의 PG 를 가지는 것입니다.) 이 방법은 실제 응용 시나리오에서는 제한적입니다. 다른 방법은 PG 매핑 프로세스를 다음과 같이 조정하는 것입니다. (수동 개입) 이 조정은 여러 방법이 있을 수 있으며 개별적으로 소개합니다.</p><p id="39a85080-6dc3-49af-9476-d454ae8dbf81" class="">
+</p><h3 id="ce95524e-1df5-49ad-89ea-b44e8de949e3" class="">2.4.1 reweight</h3><p id="917bdde7-a742-4fbc-a358-42e0a423ae58" class="">CRUSH 가 PG 를 매핑하는 이유는 CRUSH weight 이라고 하는 각 OSD 의 Weight 으로, 데이터를 전달하는 디스크 용량 간의 물리적 차이를 반영합니다. 이는 불편하고 수동으로 조정해야 합니다.</p><p id="5c28457c-eace-4aa5-b068-2e585b95d7b5" class="">해결책은 마이그레이션 weight (위에서 언급한 reweight) 이라는 개념을 도입하는 것입니다. reweight 값을 조정함으로서, 특정 수의 PG 가 대응하는 OSD 에 이동함으로서, OSD 간의 PG 수가 균형을 잡아가는 경향을 보일 수 있습니다.</p><p id="0f84c02f-1ed2-4419-adf1-5d098901d4ee" class="">PG 마이그레이션의 효과는 실제로 동일합니다. 예를들어, 과부화된 OSD 의 reweight 을 줄여 저 부하의 OSD 로 이동하도록 선택할 수 있습니다. 이러한 변경이 과부하 OSD 로부터의 PG 마이그레이션을 유도합니다. 따라서 단방향 조정으로 이를 달성할 수 있습니다.</p><p id="697e0b59-6d07-464a-af97-2a9687f73782" class="">reweight  을 통해 단일 OSD 의 PG  분포를 조정하는 과정은 다음과 같습니다. 먼저 클러스터의 사용량 통계를 봅니다.</p><pre id="2685abb3-56f1-4520-a872-52f5e83bda60" class="code"><code>ceph osd df tree</code></pre><p id="6edd37d6-1253-4410-bb01-cef02cb1e758" class="">현재 사용량이 가장 많은 OSD 를 찾아 하나씩 실행합니다.</p><pre id="74687750-6386-4460-8c9d-ff21b2bbc1d9" class="code"><code>ceph osd reweight {osd-num} {reweight}
+# reweight: [0, 1]</code></pre><p id="4849971b-a018-46cb-bc65-3f136087d9c9" class="">OSD 의 현재 사용률에 따라, (reweight by utilization) OSD 사이의 PG 분포에 따라 (reweight by pg) 정상적인 업무에 영향을 미치지 않도록 위 명령이 실행된 후 PG 마이그레이션 상황에 대한 관련 통계를 확인하여 수행 타이밍을 계획할 수 있습니다. (다음은 reweight-by-utilization) </p><pre id="39571fe8-947d-47c1-b6e3-f18cfdf5e790" class="code"><code>ceph osd test-reweight-by-utilization {overload}{max_change} {max_osds} {--no-incresing}</code></pre><ul id="4c72cb14-4a97-41b0-ac5a-69019fb9c2c7" class="bulleted-list"><li><code>overload</code>: 선택, 정수, 100보다 커야하며, 기본값은 120 입니다. 사용량이 평균 클러스터 사용량/100 이상인 경우에만 조정합니다.</li></ul><ul id="e812dc5d-c093-44a1-9ec9-3655ba92d89e" class="bulleted-list"><li><code>max_change</code>: 선택, 소숫점, [0, 1], 기본값은 0.05. 매번 reweight 의 최대 값 조정. 즉, 조절할 상한을 입력합니다. 각 OSD 의 실제 조절 범위는 자체 공간 사용량과 클러스터의 평균 공간 사용량 사이의 편차의 정도에 따라 다릅니다. 조절값이 클수록, 조절값이 작아집니다..</li></ul><ul id="c2ea254d-9f5f-4e2b-a081-59ac7191ad1d" class="bulleted-list"><li><code>max_osds</code>:  각 조정 당 최대 OSD 수 (기본 4)<figure id="64f3d642-bf2f-41ed-b51f-3b989a2d3aae" class="image"><a href="CRUSH/Untitled%2017.png"><img style="width:528px" src="CRUSH/Untitled%2017.png"/></a></figure></li></ul><p id="1f2a31ce-c17a-487e-bad6-4cd321e8efe3" class="">실제로 실행되면 다음을 볼 수 있습니다.</p><ul id="1a72595a-12ca-41da-b8ec-7462de262bd8" class="bulleted-list"><li>197개 PG 마이그레이션</li></ul><ul id="621282b9-04e8-4b9e-bca9-7989dc1c0a31" class="bulleted-list"><li>각 OSD 에서 이동하는 편균 PG 수는 344.25, 명령을 수행하면 표준 편차가 90.4592에서 92.0923으로 변경됨</li></ul><ul id="81a974dd-27d7-4fc4-b6e1-e173a3045d26" class="bulleted-list"><li>현재 가장 가벼운 OSD 는 11 이며 61 → 60 PG 로 조정됨</li></ul><p id="1d83a582-8527-4201-86c1-c07d533828fb" class="">...</p><p id="c646b014-7c29-4a22-a5bd-9f89caf01792" class="">
+</p><p id="b5dbe112-958c-41bd-b954-fb23b56c585c" class="">&lt;계속&gt;</p></div></article></body></html>
