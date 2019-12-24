@@ -1,1 +1,1 @@
-# STUDY
+# CEPH STUDY
